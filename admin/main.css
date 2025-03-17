@@ -104,3 +104,51 @@ header .logo{
     background-repeat: no-repeat;
     background-image: url(./../img/delete.png);
 }
+
+.lista-informes-area{
+    padding: 2rem;
+}
+
+.lista-informes-area ul{
+    list-style: none;
+    display: inline-flex;
+    margin-bottom: 1rem;
+}
+
+.lista-informes-area ul li{
+    margin-right: .5rem;
+}
+
+.lista-informes-area ul .nome{
+    font-weight: bolder;
+    width: 250px;
+    font-size: 10pt;
+}
+
+.lista-informes-area ul .cpf{
+    font-size: 9pt;
+}
+
+.lista-informes-area ul .baixar-informe-btn{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #323232;
+    background-position: center;
+    background-size: 40%;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-image: url(./../img/download.png);
+}
+
+.lista-informes-area ul .deletar-informe-btn{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #E0033E;
+    background-position: center;
+    background-size: 50%;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-image: url(./../img/delete.png);
+}

@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@4.0.2"></script>
     <link rel="stylesheet" href="./main.css">
     <title>Financeiro Ícone - Admin</title>
 </head>
@@ -15,19 +18,22 @@
     </header>
     <section class="enviar-arquivos-area" id="enviar-arquivos-area">
         <center>
-            <h3>Enviar Arquivos PDF´s</h3>
+            <h3>Enviar Arquivo de Informe de Rendimento</h3>
             <ul class="btn-ul">
-                <li><input type="file" multiple id="enviar-arquivo-pdf-input"></li>
+                <li><input type="file" id="enviar-arquivo-pdf-input"></li>
                 <li><div class="enviar-pdf-btn" id="enviar-pdf-btn">Enviar</div></li>
             </ul>
+            <div class="progresso-area" id="progresso-area">
+                <progress id="progress-bar" value="0" max="100"></progress>
+            </div>
         </center>
-        <h4>Documentos Existentes no Sistema</h4>
-        <div class="lista-arquivos-area" id="lista-arquivos-area">
+        <h4>Informes de Rendimento Existentes no Sistema</h4>
+        <div class="lista-informes-area" id="lista-informes-area">
 
         </div>
     </section>
-
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="./app.js"></script>
 </body>

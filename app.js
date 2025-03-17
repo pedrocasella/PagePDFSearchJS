@@ -13,8 +13,9 @@ function formatCPF(cpf) {
 }
 
 document.getElementById("buscar-pdf-btn").addEventListener("click", async function () {
+    document.getElementById('geral-loading').style.display = 'block'
     let cpf = document.getElementById("cpfInput").value.trim();
-    cpf = formatCPF(cpf);
+    cpf = formatCPF(cpf);  // Suponho que a função formatCPF formate o CPF corretamente
 
     if (!cpf) {
         Toastify({
@@ -27,39 +28,87 @@ document.getElementById("buscar-pdf-btn").addEventListener("click", async functi
             stopOnFocus: true,
             style: { background: 'red' },
         }).showToast();
+        document.getElementById('geral-loading').style.display = 'none'
         return;
     }
 
-    document.getElementById("pdfContainer").innerHTML = "";
+    // Acesso ao Realtime Database no Firebase
+    const informeRendimentosRef = ref(database, `informeRendimentos/`);
+    get(informeRendimentosRef).then((snapshot) => {
+        
+        const data = snapshot.val();
+        const informes = [];
 
-    let foundPdf = false;
+        if (data) {
+            Object.keys(data).forEach((key) => {
+                const informe = data[key];
+                if (informe.CPF === cpf) {
+                    // Adiciona os informes com o CPF correspondente à lista
+                    informes.push(informe);
+                }
+            });
 
-    // 🔹 Busca PDFs no Firebase
-    const pdfsRef = ref(database, "pdfs/");
-    const snapshot = await get(pdfsRef);
+            if (informes.length > 0) {
+                // Se houver informes com o CPF correspondente, vamos gerar os PDFs
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4'); // Criando um documento PDF em formato A4
 
-    if (snapshot.exists()) {
-        const pdfs = snapshot.val();
-        for (const key in pdfs) {
-            const { base64Pdf } = pdfs[key];
-            const pdfData = atob(base64Pdf.split(",")[1]); 
-            const typedarray = new Uint8Array(pdfData.length);
-            for (let i = 0; i < pdfData.length; i++) {
-                typedarray[i] = pdfData.charCodeAt(i);
+                informes.forEach((informe, index) => {
+                    // Criar um objeto Image para calcular as proporções da imagem
+                    const img = new Image();
+                    img.onload = function () {
+                        // Obter as dimensões da imagem
+                        const imgWidth = img.width;
+                        const imgHeight = img.height;
+
+                        // Dimensões da página A4
+                        const maxWidth = 210;  // Largura máxima da página A4 (210mm)
+                        const maxHeight = 297; // Altura máxima da página A4 (297mm)
+
+                        // Calcular a proporção para ajustar a imagem de modo que cubra toda a página
+                        const widthRatio = maxWidth / imgWidth;
+                        const heightRatio = maxHeight / imgHeight;
+
+                        // Usar a maior proporção para garantir que a imagem cubra a página
+                        const ratio = Math.max(widthRatio, heightRatio);
+
+                        // Calcular o tamanho final da imagem
+                        const finalWidth = imgWidth * ratio;
+                        const finalHeight = imgHeight * ratio;
+
+                        // Adicionar a imagem ao PDF, posicionando-a para que cubra a página
+                        doc.addImage(img, 'JPEG', 0, 0, finalWidth, finalHeight);
+
+                        // Se não for o último informe, adicionar uma nova página no PDF
+                        if (index < informes.length - 1) {
+                            doc.addPage(); // Nova página para o próximo informe
+                        } else {
+                            // Quando terminar, salvar o PDF
+                            doc.save(`${cpf}_informe.pdf`);
+                            document.getElementById('geral-loading').style.display = 'none'
+                        }
+                    };
+
+                    // Definir a imagem do base64 para o objeto Image
+                    img.src = informe.base64Comprimido;
+                });
+            } else {
+                Toastify({
+                    text: "Nenhum informe encontrado para este CPF.",
+                    duration: 3000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "bottom",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: { background: 'orange' },
+                }).showToast();
+                document.getElementById('geral-loading').style.display = 'none'
             }
-
-            const found = await findCpfPages(typedarray, cpf);
-            if (found) foundPdf = true;
         }
-    }
-
-    // 🔹 Busca o PDF localmente
-    const foundLocalPdf = await loadLocalPdf(cpf);
-    if (foundLocalPdf) foundPdf = true;
-
-    if (!foundPdf) {
+    }).catch((error) => {
         Toastify({
-            text: "Nenhum documento encontrado!",
+            text: "Erro ao buscar os dados.",
             duration: 3000,
             newWindow: true,
             close: true,
@@ -68,89 +117,9 @@ document.getElementById("buscar-pdf-btn").addEventListener("click", async functi
             stopOnFocus: true,
             style: { background: 'red' },
         }).showToast();
-    }
+        console.error(error);
+    });
 });
 
-// 🔹 Função para carregar e verificar o PDF local
-async function loadLocalPdf(cpf) {
-    try {
-        const response = await fetch("./docs/INFORME DE RENDIMENTOS 2025 (1).pdf");
-        if (!response.ok) throw new Error("Falha ao carregar o PDF local");
 
-        const pdfData = await response.arrayBuffer();
-        return await findCpfPages(pdfData, cpf);
-    } catch (error) {
-        console.error("Erro ao carregar PDF local:", error);
-        return false;
-    }
-}
 
-// 🔹 Configura o pdf.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
-
-// 🔹 Função para buscar CPF dentro das páginas do PDF
-async function findCpfPages(pdfData, cpf) {
-    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-    let found = false;
-
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 2 }); // Aumenta a qualidade
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        const renderContext = {
-            canvasContext: context,
-            viewport: viewport
-        };
-
-        await page.render(renderContext).promise; // Renderiza a página no canvas
-
-        // Converte a página para imagem Base64
-        const imageBase64 = canvas.toDataURL("image/png");
-
-        // Aplica OCR para extrair texto da imagem
-        const text = await extractTextFromImage(imageBase64);
-
-        console.log("Texto extraído da página " + pageNum + ": ", text); // Debug
-
-        if (text.includes(cpf)) {
-            found = true;
-            await renderPage(page);
-        }
-    }
-
-    return found;
-}
-
-// 🔹 Função para extrair texto de imagem com OCR (Definição corrigida)
-async function extractTextFromImage(imageBase64) {
-    const { data: { text } } = await Tesseract.recognize(
-        imageBase64,
-        "por", // Define o idioma para português
-        {
-            logger: m => console.log(m) // Mostra o progresso no console
-        }
-    );
-    return text;
-}
-
-// 🔹 Função para renderizar páginas no HTML
-async function renderPage(page) {
-    const viewport = page.getViewport({ scale: 1.5 });
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-
-    await page.render({ canvasContext: context, viewport }).promise;
-    document.getElementById("pdfContainer").appendChild(canvas);
-}
-
-document.getElementById('baixar-arquivo-btn').addEventListener('click', () => {
-    window.print();
-});

@@ -4,6 +4,154 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Loaders */
+
+.geral-loading{
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    position: fixed;
+    display: none;
+    background-color: #ffffff48;
+}
+    
+
+    /* Star Loading */
+    .star {
+        height: 96px;
+        width: 96px;
+        position: relative;
+        animation: rotate 2s ease infinite;
+   }
+    .corner {
+        height: 50%;
+        width: 50%;
+        margin: -.2rem;
+        border: 1.5px solid;
+        position: absolute;
+        animation: radius 2s ease infinite;
+   }
+    .corner--top-left {
+        top: 0;
+        left: 0;
+   }
+    .corner--top-right {
+        top: 0;
+        right: 0;
+   }
+    .corner--bottom-right {
+        bottom: 0;
+        right: 0;
+   }
+    .corner--bottom-left {
+        bottom: 0;
+        left: 0;
+   }
+    @keyframes rotate {
+        to {
+            transform: rotate(360deg);
+       }
+   }
+    @keyframes radius {
+        0% {
+            border-radius: 15%;
+       }
+        50% {
+            border-radius: 55%;
+       }
+        100% {
+            border-radius: 15%;
+       }
+   }
+    
+
+    /*----------------*/
+    /* Spinner */
+        .loader-spinner {
+            width: 50px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: 
+            radial-gradient(farthest-side,#ffa516 94%,#0000) top/8px 8px no-repeat,
+            conic-gradient(#0000 30%,#ffa516);
+            -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+            animation: l13 1s infinite linear;
+        }
+        @keyframes l13{ 
+            100%{transform: rotate(1turn)}
+        }
+    /*--------*/
+    /* Loading das Bolinhas */
+
+        :root {
+            --loading-spinner-size: 2rem;
+            --loading-spinner-gap: 1; /* [1] */
+            --loading-spinner-wrapper: calc(var(--loading-spinner-size) * 3 + var(--loading-spinner-gap) * var(--loading-spinner-size) * 2); /* [2] */
+            --loading-spinner-color: #222;
+            
+            --animation-timing: cubic-bezier(0, 1, 1, 0);
+            --animation-duration: 600ms;
+            --animation-count: infinite;
+        }
+        
+        .loading {
+            --spacer: calc(var(--loading-spinner-size) * var(--loading-spinner-gap) + var(--loading-spinner-size)); /* [3] */
+            position: relative;
+            width: var(--loading-spinner-wrapper);
+            height: var(--loading-spinner-size);
+            margin-top: 200px;
+            /* border: 1px solid red; */ /* [4] */
+        }
+        
+        .loading span {
+            position: absolute;
+            top: 0;
+            width: var(--loading-spinner-size);
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            background: var(--loading-spinner-color);
+            animation-timing-function: var(--animation-timing);
+        }
+        
+        .loading span:nth-child(1) {
+            left: 0;
+            animation: scale-up var(--animation-duration) var(--animation-count);
+        }
+        
+        .loading span:nth-child(2) {
+            left: 0;
+            animation: move-right var(--animation-duration) var(--animation-count);
+        }
+        
+        .loading span:nth-child(3) {
+            left: calc(var(--spacer) * 1);
+            animation: move-right var(--animation-duration) var(--animation-count);
+        }
+        
+        .loading span:nth-child(4) {
+            left: calc(var(--spacer) * 2);
+            animation: scale-down var(--animation-duration) var(--animation-count);
+        }
+        
+        @keyframes scale-up {
+            from { transform: scale(0) }
+            to   { transform: scale(1) }
+        }
+        
+        @keyframes scale-down {
+            from { transform: scale(1) }
+            to   { transform: scale(0) }
+        }
+        
+        @keyframes move-right {
+            from { transform: translate(0, 0)    }
+            to   { transform: translate(var(--spacer), 0) } /* [3] */
+        }
+    /*-------------------*/
+
+
+/*---------*/
+
 body{
     background-color: #fffafa;
 }
