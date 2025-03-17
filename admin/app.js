@@ -1,12 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-import { get, getDatabase, ref, push, set, remove, update, child } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-database.js";
-import { getFirestore, collection, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { get, getDatabase, ref, push, set, remove } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-database.js";
+import { PDFDocument } from "https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js";
 
-import { firebaseConfig } from './../firebaseConfig.js';
+import { firebaseConfig } from "./../firebaseConfig.js";
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
-const firestore = getFirestore(app);
 
 // Evento para envio dos PDFs
 document.getElementById("enviar-pdf-btn").addEventListener("click", async function () {
@@ -17,40 +16,70 @@ document.getElementById("enviar-pdf-btn").addEventListener("click", async functi
         Toastify({
             text: "Selecione pelo menos um arquivo PDF!",
             duration: 3000,
-            newWindow: true,
-            close: true,
-            gravity: "bottom", // `top` or `bottom`
-            position: "right", // `left`, `center` or `right`
-            stopOnFocus: true, // Prevents dismissing of toast on hover
-            style: {
-                background: 'red',
-            },
-            onClick: function(){} // Callback after click
+            gravity: "bottom",
+            position: "right",
+            style: { background: "red" },
         }).showToast();
         return;
     }
 
     for (const file of files) {
-        const base64Pdf = await convertFileToBase64(file);
-        await savePdfToFirebase(file.name, base64Pdf);
+        try {
+            // Reduzir o PDF se necessário
+            const compactedFile = await reduzirQualidadePDF(file, 5); // Reduz até 5MB
+            const base64Pdf = await convertFileToBase64(compactedFile); // Converte para Base64
+
+            // Salvar no Firebase
+            await savePdfToFirebase(file.name, base64Pdf);
+        } catch (error) {
+            Toastify({
+                text: error.message, // Mensagem de erro
+                duration: 3000,
+                gravity: "bottom",
+                position: "right",
+                style: { background: "red" },
+            }).showToast();
+            continue; // Pular para o próximo arquivo
+        }
     }
 
     Toastify({
         text: "Arquivos enviados com sucesso!",
         duration: 3000,
-        newWindow: true,
-        close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
-        style: {
-            background: 'green',
-        },
-        onClick: function(){} // Callback after click
+        gravity: "bottom",
+        position: "right",
+        style: { background: "green" },
     }).showToast();
-    document.getElementById("enviar-arquivo-pdf-input").value = ''
-    carregarUploadsExistentes()
+
+    document.getElementById("enviar-arquivo-pdf-input").value = "";
+    carregarUploadsExistentes();
 });
+
+// Função para reduzir qualidade do PDF
+async function reduzirQualidadePDF(file, maxSizeMB) {
+    let arrayBuffer = await file.arrayBuffer();
+    let pdfDoc = await PDFDocument.load(arrayBuffer);
+
+    let pdfBytes = await pdfDoc.save();
+    let pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+
+    // Repetir o processo até que o tamanho do arquivo seja menor que o limite
+    while (pdfBlob.size > maxSizeMB * 1024 * 1024) {
+        const scaleFactor = 0.9; // Fator de redução (reduz a cada iteração)
+        const pages = pdfDoc.getPages();
+
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const { width, height } = page.getSize();
+            page.setSize(width * scaleFactor, height * scaleFactor); // Reduz tamanho da página
+        }
+
+        pdfBytes = await pdfDoc.save();
+        pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+    }
+
+    return pdfBlob;
+}
 
 // Função para converter arquivo em Base64
 function convertFileToBase64(file) {
@@ -64,44 +93,45 @@ function convertFileToBase64(file) {
 
 // Função para salvar no Firebase Realtime Database
 async function savePdfToFirebase(nomeArquivo, base64Pdf) {
-    const pdfRef = push(ref(database, "pdfs/")); // Cria um novo registro no nó "pdfs"
+    const pdfRef = push(ref(database, "pdfs/"));
     await set(pdfRef, {
         nomeArquivo: nomeArquivo,
         base64Pdf: base64Pdf,
-        uuid:  push(ref(database, "pdfs/")).key
+        uuid: pdfRef.key,
     });
 }
 
-function carregarUploadsExistentes(){
-    const pdfRef = ref(database, `pdfs/`)
+// Função para carregar uploads existentes
+function carregarUploadsExistentes() {
+    const pdfRef = ref(database, `pdfs/`);
 
-    get(pdfRef).then((snapshot)=>{
-        const data = snapshot.val()
-        document.getElementById('lista-arquivos-area').innerHTML = ''
-        if(data){
-            Object.values(data).forEach((doc)=>{
-                document.getElementById('lista-arquivos-area').innerHTML += `
-                            <ul id="doc-arquivo-ul-${doc.uuid}">
-                <li class="nome-arquivo-li">${doc.nomeArquivo}</li>
-                <li><div class="baixar-pdf-btn" id="baixar-pdf-btn" style="display: none"></div></li>
-                <li><div class="deletar-pdf-btn" id="deletar-pdf-btn" data-doc-uuid="${doc.uuid}"></div></li>
-            </ul><br>
-                
-                `
-            })
+    get(pdfRef).then((snapshot) => {
+        const data = snapshot.val();
+        document.getElementById("lista-arquivos-area").innerHTML = "";
+        if (data) {
+            Object.values(data).forEach((doc) => {
+                document.getElementById("lista-arquivos-area").innerHTML += `
+                    <ul id="doc-arquivo-ul-${doc.uuid}">
+                        <li class="nome-arquivo-li">${doc.nomeArquivo}</li>
+                        <li><div class="baixar-pdf-btn" id="baixar-pdf-btn" style="display: none"></div></li>
+                        <li><div class="deletar-pdf-btn" id="deletar-pdf-btn" data-doc-uuid="${doc.uuid}"></div></li>
+                    </ul><br>
+                `;
+            });
         }
-    })
+    });
 }
 
-carregarUploadsExistentes()
+carregarUploadsExistentes();
 
-document.getElementById('lista-arquivos-area').addEventListener('click', (e)=>{
-    const docUuid = e.target.dataset.docUuid
+// Evento para deletar arquivos
+document.getElementById("lista-arquivos-area").addEventListener("click", (e) => {
+    const docUuid = e.target.dataset.docUuid;
 
-    if(docUuid){
-        const pdfRef = ref(database, `pdfs/${docUuid}`)
-        remove(pdfRef).then(()=>{
-            carregarUploadsExistentes()
-        })
+    if (docUuid) {
+        const pdfRef = ref(database, `pdfs/${docUuid}`);
+        remove(pdfRef).then(() => {
+            carregarUploadsExistentes();
+        });
     }
-})
+});
