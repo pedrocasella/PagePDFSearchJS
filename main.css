@@ -1,0 +1,70 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body{
+    background-color: #fffafa;
+}
+
+.search-area{
+    display: block;
+}
+
+.search-area .icon-logo{
+    width: 100px;
+    height: 100px;
+    margin-top: 150px;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url(././img/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC\ \(3\).webp);
+}
+
+.search-area .btn-ul{
+    list-style: none;
+}
+
+.search-area #cpfInput{
+    width: 200px;
+    border-radius: 12px;
+    border: solid #323232 .5px;
+    margin-top: 2rem;
+    padding: .5rem .5rem .5rem 2.3rem;
+    background-image: url(./../img/search.webp);
+    background-size: 20px;
+    background-position-y: center;
+    background-position-x: 10px;
+    background-repeat: no-repeat;
+}
+
+.search-area .buscar-pdf-btn{
+    width: fit-content;
+    padding: .8rem;
+    font-weight: bolder;
+    color: #fffafa;
+    background-color: #323232;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    user-select: none;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.baixar-arquivo-btn{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin: 2rem;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    background-position: center;
+    background-size: 40%;
+    display: none;
+    background-repeat: no-repeat;
+    background-color: #323232;
+    border-radius: 50%;
+    background-image: url(./img/download.png);
+}

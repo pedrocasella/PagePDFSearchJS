@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <link rel="stylesheet" href="./main.css">
+    <title>Financeiro Ícone - Consulta de Documentos</title>
+</head>
+<body>
+    <section class="search-area" id="search-area">
+        <center>
+            <div class="icon-logo"></div>
+            <ul class="btn-ul">
+                <li><input type="text" id="cpfInput" placeholder="CPF"></li>
+                <li><div class="buscar-pdf-btn" id="buscar-pdf-btn">Buscar</div></li>
+            </ul>
+        </center>
+    
+    </section>
+    <div class="baixar-arquivo-btn" id="baixar-arquivo-btn"></div>
+    
+    <input type="file" id="fileInput" style="display: none;" />
+    <div id="pdfContainer"></div>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script type="module" src="./app.js"></script>
+
+</body>
+</html>

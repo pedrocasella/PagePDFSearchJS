@@ -1,0 +1,106 @@
+*{
+    padding: 0;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body{
+    background-color: #fffafa;
+}
+
+header{
+    padding: 1rem 0rem 1rem 0rem;
+    border-bottom: solid #323232 1px;
+    -webkit-box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.06); 
+    box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.06);
+}
+
+header .logo{
+    width: 70px;
+    height: 70px;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url(./../img/xlogo_icone_site.png.pagespeed.ic_.QgXP3GszLC\ \(3\).webp);
+    
+}
+
+.enviar-arquivos-area{
+    margin-top: 2rem;
+}
+
+.enviar-arquivos-area h3{
+    margin-bottom: 1rem;
+}
+
+.enviar-arquivos-area .btn-ul{
+    list-style: none;
+    display: inline-flex;
+}
+
+.enviar-arquivos-area .btn-ul li{
+    margin-right: 1rem;
+}
+
+.enviar-arquivos-area .btn-ul #enviar-arquivo-pdf-input{
+    margin-top: .5rem;
+}
+
+.enviar-arquivos-area .enviar-pdf-btn{
+    width: fit-content;
+    padding: .6rem .6rem .6rem 1.8rem;
+    background-position-x: 8px;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-size: 15px;
+    background-image: url(./../img/uploadicon.png);
+    font-weight: bolder;
+    color: #fffafa;
+    background-color: #323232;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    user-select: none;
+    cursor: pointer;
+    font-size: 10pt;
+}
+
+.enviar-arquivos-area .lista-arquivos-area{
+    padding: 2rem;
+}
+
+.enviar-arquivos-area h4{
+    margin-left: 2rem;
+    margin-top: 2rem;
+}
+
+.enviar-arquivos-area .lista-arquivos-area ul{
+    list-style: none;
+    display: inline-flex;
+    padding: 1rem;
+    border: solid #323232 1px;
+    margin-bottom: .5rem;
+    border-radius: 4px;
+}
+
+.enviar-arquivos-area .lista-arquivos-area ul li{
+    margin-right: .5rem
+}
+
+.enviar-arquivos-area .lista-arquivos-area ul .nome-arquivo-li{
+    width: 250px;
+    font-size: 10pt;
+    font-weight: bolder;
+    margin-top: .3rem;
+}
+
+.enviar-arquivos-area .lista-arquivos-area ul .deletar-pdf-btn{
+    width: 30px;
+    height: 30px;
+    background-color: #E0033E;
+    border-radius: 50%;
+    background-position: center;
+    cursor: pointer;
+    background-size: 50%;
+    background-repeat: no-repeat;
+    background-image: url(./../img/delete.png);
+}

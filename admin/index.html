@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="./main.css">
+    <title>Financeiro Ícone - Admin</title>
+</head>
+<body>
+    <header>
+        <center>
+            <div class="logo" id="logo"></div>
+        </center>
+    </header>
+    <section class="enviar-arquivos-area" id="enviar-arquivos-area">
+        <center>
+            <h3>Enviar Arquivos PDF´s</h3>
+            <ul class="btn-ul">
+                <li><input type="file" multiple id="enviar-arquivo-pdf-input"></li>
+                <li><div class="enviar-pdf-btn" id="enviar-pdf-btn">Enviar</div></li>
+            </ul>
+        </center>
+        <h4>Documentos Existentes no Sistema</h4>
+        <div class="lista-arquivos-area" id="lista-arquivos-area">
+
+        </div>
+    </section>
+
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
